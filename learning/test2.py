@@ -30,8 +30,8 @@ if len(faceRects):  # 大于0则检测到人脸
                       (x + 5 * w // 8, y + 7 * h // 8), color)
         '''
 
-cv2.imshow("image", cropped)  # 显示图像
-k = cv2.waitKey(0)
-if k == ord("s"):
-    cv2.imwrite("imagePath/9-3.png", cropped)
-cv2.destroyAllWindows()
+        cv2.imshow("image", cropped)  # 显示图像
+        k = cv2.waitKey(0)
+        if k == ord("s"):
+            cv2.imwrite("imagePath/9-3.png", cropped)
+            cv2.destroyAllWindows()
