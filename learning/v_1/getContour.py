@@ -1,9 +1,12 @@
 import cv2
+import numpy as np
+from mergedRect import mergedRect
 
-g=cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
+# g=cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
 
+filename = "roi3"
 # 获取图像
-origin_img = cv2.imread("roi3.tif")
+origin_img = cv2.imread("../core/image/"+filename+".tif")
 # 灰度
 img_gray= cv2.cvtColor(origin_img, cv2.COLOR_BGR2GRAY)
 # 自适应阈值二值化
@@ -16,32 +19,34 @@ print(len(contours))
 count = 0
 newContours = []
 for x in contours:
-    if( x.size < 50000 and x.size > 100):
-    # if (x.size == 184):
+    # if( x.size < 50000 and x.size > 100):
+    if (x.size == 108):
+    # if True:
         newContours.append(x)
         count = count + 1
-        print(x.shape)
-        print(x.size)
+        # print(x.shape)
+        # print(x.size)
 print("count :" + str(count))
 
-# result_img = cv2.drawContours(origin_img,newContours,-1,(0,0,255),3)
+# 在白底上画出轮廓
+temp = np.ones(bin_img.shape,np.uint8)*255
+temp = cv2.drawContours(temp, contours, -1, (0, 0, 255), 3)
+cv2.imwrite(filename+"contours.png",temp)
+
+
 ncount = count
 for c in range(len(newContours)):
-    # rect = cv2.minAreaRect(newContours[c])
-    # cx, cy = rect[0]
-    # box = cv2.boxPoints(rect)
-    # box = np.int0(box)
-    # cv2.drawContours(img,[box],0,(0,255,0),2)
-    # cv2.circle(img, (np.int32(cx), np.int32(cy)), 2, (255, 0, 0), 2, 8, 0)
+    # print(type(newContours[c]))
     x,y,w,h=cv2.boundingRect(newContours[c])
-    #Straight Bounding Rectangle
-    if(w*h > 2000):
+    # print("x,y,w,h=" +str(x) + "//" +str(y) + "//"+str(w)+"//"+str(h))
+    if(w*h > 1000):
+    # if True:
         ncount = ncount - 1
         cv2.rectangle(origin_img,(x,y),(x+w,y+h),(0,255,0),2)
         cv2.drawContours(origin_img, newContours, c, (0, 0, 255), 2, 8)
 print(count - ncount)
 
-cv2.imwrite("result3.png",origin_img)
+cv2.imwrite(filename+"_result.png",origin_img)
 
 
 
