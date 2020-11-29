@@ -37,9 +37,12 @@ for c in newContours:
 
 print("len:"+str(len(lastContours)))
 
-for i in range(len(lastContours)-1):
-    j = i + 1
+i = 0
+while(i < len(lastContours)-1):
+    # j = i + 1
+    j = 1 if i == 0 else 0
     while(j <= len(lastContours)-1):
+        print("现在i,j为" +str(i)+"," +str(j) )
         minx1,miny1,maxx1,maxy1 = lastContours[i]
         print(minx1,miny1,maxx1,maxy1)
         minx2,miny2,maxx2,maxy2 = lastContours[j]
@@ -47,19 +50,30 @@ for i in range(len(lastContours)-1):
         print(minx2,miny2,maxx2,maxy2)
         print("///")
         a,b,c,d = mergedRect(minx1,miny1,maxx1,maxy1,minx2,miny2,maxx2,maxy2)
+        # 判断两个矩形是否可以合并
         if a != -1:
-            print("-1")
+            print("发现可以合并，现在i,j为" +str(i)+"," +str(j) )
             print(a,b,c,d)
             print(str(j)+"::"+str(lastContours[j]))
-            # print(str(j+1)+"::"+str(lastContours[j+1]))
-            lastContours[i]= [a,b,c,d]
-            print("删除的为"+str(lastContours.pop(j)))
-            # print(str(j)+"::"+str(lastContours[j]))
-            # print(str(j+1)+"::"+str(lastContours[j+1]))
+            if(j>i):
+                lastContours[i]= [a,b,c,d]
+                print("删除的为"+str(lastContours.pop(j)))
+            else:
+                lastContours[j]= [a,b,c,d]
+                print("删除的为"+str(lastContours.pop(i)))
+                i = j
+
             print("len"+str(len(lastContours)))
-            j = i + 1
+            # 合并之后需要从头开始遍历
+            # j = i + 1
+            j = 1 if i == 0 else 0
         else:
-            j=j+1
+            print("现在i,j为" +str(i)+"," +str(j) )
+            if(i == j+1):
+                j = i + 1
+            else:
+                j = j + 1
+    i = i + 1
 print(len(lastContours))
 
 
