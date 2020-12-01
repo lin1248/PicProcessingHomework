@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 
-filename = "roi1"
+filename = "roi2"
 # 获取图像
 origin_img = cv2.imread("../core/image/"+filename+".tif")
 
@@ -12,16 +12,21 @@ origin_img = cv2.imread("../core/image/"+filename+".tif")
 origin_img = cv2.pyrDown(origin_img)
 
 # canny(): 边缘检测
-img1 = cv2.GaussianBlur(origin_img,(3,3),0)
-bin_img = cv2.Canny(img1, 100, 200)
+# img1 = cv2.GaussianBlur(origin_img,(3,3),0)
+# bin_img = cv2.Canny(img1, 100, 200)
 
 # cv2.imshow("origin_img",bin_img)
 # cv2.waitKey(0)
 
 # 形态学：边缘检测
-# _,Thr_img = cv2.threshold(origin_img,210,255,cv2.THRESH_BINARY)#设定红色通道阈值210（阈值影响梯度运算效果）
-# kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))         #定义矩形结构元素
-# bin_img = cv2.morphologyEx(Thr_img, cv2.MORPH_GRADIENT, kernel) #梯度
+img_gray= cv2.cvtColor(origin_img, cv2.COLOR_BGR2GRAY)
+_,Thr_img = cv2.threshold(img_gray,170,255,cv2.THRESH_BINARY)#设定红色通道阈值210（阈值影响梯度运算效果）
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))         #定义矩形结构元素
+bin_img = cv2.morphologyEx(Thr_img, cv2.MORPH_GRADIENT, kernel) #梯度
+
+cv2.imwrite("bin_img.png",bin_img)
+
+# 滤波
 
 
 # # 灰度
@@ -31,10 +36,11 @@ bin_img = cv2.Canny(img1, 100, 200)
 # # 手动阈值
 # # ret,bin_img = cv2.threshold(img_gray,100,255,cv2.THRESH_BINARY)
 
-# # 创建矩形结构单元
+# 创建矩形结构单元
 # g=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
-# # 帽处理
-# bin_img = cv2.morphologyEx(bin_img, cv2.MORPH_BLACKHAT, g)
+# 帽处理
+# bin_img = cv2.morphologyEx(bin_img, cv2.MORPH_TOPHAT, g)
+# cv2.imwrite("Blcakhat_img.png",bin_img)
 
 # 提取轮廓
 contours,hierarchy = cv2.findContours(bin_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -53,7 +59,7 @@ for x in contours:
 print("count :" + str(count))
 
 lastContours = []
-# 合并长方形
+# 去掉过大或者过小的轮廓
 for c in newContours:
     x,y,w,h = cv2.boundingRect(c)
     if w*h < 1000000 and w*h > 1000:
