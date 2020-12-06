@@ -3,7 +3,7 @@ import numpy as np
 from function import *
 
 # def getProcessedBin(filename):
-filename = "roi3"
+filename = "roi2"
 # 获取图像
 origin_img = cv2.imread("../core/image/"+filename+".tif")
 
@@ -24,7 +24,7 @@ upper_roof = np.array([180,43,220])
 
 img_gray = cv2.cvtColor(origin_img,cv2.COLOR_BGR2GRAY)
 # bin_img = cv2.adaptiveThreshold(img_gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,3,5)
-_,Thr_img = cv2.threshold(img_gray,170,255,cv2.THRESH_BINARY)
+_,Thr_img = cv2.threshold(img_gray,1127,255,cv2.THRESH_BINARY)
 
 hsv = cv2.cvtColor(origin_img, cv2.COLOR_BGR2HSV)
 mask_g = cv2.inRange(hsv, lower_green, upper_green)
@@ -49,22 +49,27 @@ bin_img = medianFilter(bin_img)
 cv2.imwrite("medianFilter.png",bin_img)
 
 # 闭运算
-# bin_img = close(bin_img)
-# cv2.imwrite("close.png",bin_img)
+bin_img = close(mask_gray)
+cv2.imwrite("close.png",bin_img)
 # 开运算
-bin_img = open(bin_img)
+bin_img = open(mask_gray)
 cv2.imwrite("open.png",bin_img)
+
+bin_img = cv2.Canny(bin_img, 200, 255)
+cv2.imwrite("canny.png",bin_img)
 
 
 contours,hierarchy = cv2.findContours(bin_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
 for c in range(len(contours)):
     x,y,w,h=cv2.boundingRect(contours[c])
-    if(w*h > 10000 and w*h < 10000000):
-    # if True:
+    # if(w*h > 10000 and w*h < 10000000):
+    if True:
         cv2.rectangle(origin_img,(x,y),(x+w,y+h),(0,255,0),2)
         cv2.circle(origin_img,((2*x+w)//2,(2*y+h)//2),5,(255,0,0), 8)
         # cv2.drawContours(origin_img, contours,c, (0, 0, 255), 2, 8)
 
 cv2.imwrite("origin_img.png",origin_img)
+
+
     # return origin_img,bin_img
