@@ -2,45 +2,36 @@
 from mergedRect import mergedRect
 import numpy as np
 import cv2
-from function import * 
-
-
 
 filename = "roi2"
 # 获取图像
 origin_img = cv2.imread("../core/image/"+filename+".tif")
 
-
-
 # 预处理，将图片缩放
 origin_img = cv2.pyrDown(origin_img)
 
-
 # 形态学：边缘检测
 img_gray = cv2.cvtColor(origin_img, cv2.COLOR_BGR2GRAY)
-
 cv2.imwrite("img/img_gray.png",img_gray)
 
+# 高斯滤波
 img_gray = cv2.GaussianBlur(img_gray,(3,3),0)
-
 cv2.imwrite("img/img_gray_Gaussian.png",img_gray)
 
+# 二值化，阈值为180
 _,Thr_img = cv2.threshold(img_gray,180,255,cv2.THRESH_BINARY)
-
 cv2.imwrite("img/bin_img.png",Thr_img)
 
-kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))         #定义矩形结构元素
-bin_img = cv2.morphologyEx(Thr_img, cv2.MORPH_GRADIENT, kernel) #梯度
-
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
+bin_img = cv2.morphologyEx(Thr_img, cv2.MORPH_GRADIENT, kernel)
 cv2.imwrite("img/bin_mor.png",bin_img)
 
+# Canny算子
 bin_img = cv2.Canny(bin_img, 100, 200)
-
 cv2.imwrite("img/canny.png",bin_img)
 
 # 方框滤波
 bin_img = cv2.boxFilter(bin_img, -1, (3, 3), normalize = 0)
-
 cv2.imwrite("img/final_bin_img.png",bin_img)
 
 
@@ -68,6 +59,7 @@ for c in newContours:
 
 print("len:"+str(len(lastContours)))
 
+# 合并轮廓的外接矩形
 i = 0
 while(i < len(lastContours)-1):
     # j = i + 1
@@ -107,18 +99,16 @@ while(i < len(lastContours)-1):
 print(len(lastContours))
 
 
-
+# 画出轮廓
 for x in lastContours:
     a,b,c,d = x
     cv2.drawContours(origin_img,newContours,-1,(0,0,255),3)
-
 cv2.imwrite("img/"+filename+"_contours.png",origin_img)
 
+# 画出矩形和中心点
 for x in lastContours:
     a,b,c,d = x
     cv2.rectangle(origin_img,(a,b),(c,d),(0,255,0),2)
     cv2.circle(origin_img,((c+a)//2,(d+b)//2),5,(255,0,0), 8)
-
-
 cv2.imwrite("img/"+filename+"_result.png",origin_img)
 
