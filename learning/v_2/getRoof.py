@@ -10,7 +10,7 @@ origin_img = cv2.imread("../core/image/"+filename+".tif")
 # 预处理，将图片缩放
 origin_img = cv2.pyrDown(origin_img)
 
-# 形态学：边缘检测
+# 灰度
 img_gray = cv2.cvtColor(origin_img, cv2.COLOR_BGR2GRAY)
 cv2.imwrite("img/img_gray.png",img_gray)
 
@@ -22,6 +22,7 @@ cv2.imwrite("img/img_gray_Gaussian.png",img_gray)
 _,Thr_img = cv2.threshold(img_gray,180,255,cv2.THRESH_BINARY)
 cv2.imwrite("img/bin_img.png",Thr_img)
 
+# 形态学变换，梯度
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
 bin_img = cv2.morphologyEx(Thr_img, cv2.MORPH_GRADIENT, kernel)
 cv2.imwrite("img/bin_mor.png",bin_img)
@@ -39,8 +40,10 @@ cv2.imwrite("img/final_bin_img.png",bin_img)
 contours,hierarchy = cv2.findContours(bin_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 print(type(contours))
 print(len(contours))
+
 count = 0
 newContours = []
+# 去掉过大或者过小的轮廓
 for x in contours:
     if( x.size < 10000 and x.size > 200):
     # if True:
@@ -50,7 +53,7 @@ for x in contours:
 print("count :" + str(count))
 
 lastContours = []
-# 去掉过大或者过小的轮廓
+# 去掉过大或者过小的外接矩形的轮廓
 for c in newContours:
     x,y,w,h = cv2.boundingRect(c)
     if w*h < 50000 and w*h > 5000:
@@ -111,4 +114,3 @@ for x in lastContours:
     cv2.rectangle(origin_img,(a,b),(c,d),(0,255,0),2)
     cv2.circle(origin_img,((c+a)//2,(d+b)//2),5,(255,0,0), 8)
 cv2.imwrite("img/"+filename+"_result.png",origin_img)
-
